@@ -32,6 +32,7 @@
   let orderedQuestions = [];
   let currentIndex = 0;
   let selectedOption = null;
+  let displayedOptions = [];
 
   function loadProgress() {
     try {
@@ -122,6 +123,7 @@
 
   function renderQuestion() {
     selectedOption = null;
+    displayedOptions = [];
     els.feedback.hidden = true;
     els.feedback.className = "feedback";
 
@@ -152,10 +154,13 @@
     els.summaryLink.textContent = `Open ${topic.title} summary sheet`;
     els.markBtn.textContent = entry.marked ? "Unmark review" : "Mark for review";
 
-    els.options.innerHTML = question.options.map((option, index) => `
-      <button class="option" type="button" data-index="${index}">
-        <span class="letter">${String.fromCharCode(65 + index)}</span>
-        <span>${option}</span>
+    // Keep the question bank readable, but avoid training a pattern like "the answer is always A".
+    displayedOptions = shuffle(question.options.map((option, index) => ({ option, originalIndex: index })));
+
+    els.options.innerHTML = displayedOptions.map((item, displayIndex) => `
+      <button class="option" type="button" data-index="${item.originalIndex}">
+        <span class="letter">${String.fromCharCode(65 + displayIndex)}</span>
+        <span>${item.option}</span>
       </button>
     `).join("");
 
