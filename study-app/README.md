@@ -22,8 +22,15 @@ Progress is saved in the browser using `localStorage`, so each iPad/browser keep
 
 - `questions.js`: topic summaries and the first 120 lecture-derived multiple-choice questions.
 - `extra-questions.js`: an extra 120 questions, weighted toward quantitative/statistics revision.
+- `flashcards.js`: generated browser data for the Producing Psychological Knowledge Google Doc flashcards.
 - `app.js`: filtering, random question delivery, progress caching, answer checking, and review marking.
 - `styles.css`: responsive layout for laptop and iPad screens.
+
+The source-grounded Google Doc extraction is stored outside the published app logic:
+
+- `..\extracted_text\producing-psychological-knowledge-google-doc.txt`: extracted source notes.
+- `..\outputs\producing-psychological-knowledge-flashcards.csv`: import-friendly flashcard table.
+- `..\outputs\producing-psychological-knowledge-flashcards.md`: human-readable flashcard list.
 
 ## GitHub Pages
 

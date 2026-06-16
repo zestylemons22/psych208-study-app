@@ -1,6 +1,8 @@
 (function () {
   const data = window.STUDY_DATA;
+  const flashcards = window.FLASHCARD_DATA || [];
   const progressKey = "psych208-study-progress-v1";
+  const flashcardProgressKey = "psych208-flashcard-progress-v1";
 
   const els = {
     topicFilter: document.getElementById("topicFilter"),
@@ -24,13 +26,28 @@
     markBtn: document.getElementById("markBtn"),
     answeredCount: document.getElementById("answeredCount"),
     correctCount: document.getElementById("correctCount"),
-    accuracyRate: document.getElementById("accuracyRate")
+    accuracyRate: document.getElementById("accuracyRate"),
+    flashcardSectionFilter: document.getElementById("flashcardSectionFilter"),
+    flashcardCardNumber: document.getElementById("flashcardCardNumber"),
+    flashcardSectionName: document.getElementById("flashcardSectionName"),
+    flashcardPrompt: document.getElementById("flashcardPrompt"),
+    flashcardAnswer: document.getElementById("flashcardAnswer"),
+    flashcardTotalCount: document.getElementById("flashcardTotalCount"),
+    flashcardSeenCount: document.getElementById("flashcardSeenCount"),
+    flashcardKnownCount: document.getElementById("flashcardKnownCount"),
+    flashcardShowBtn: document.getElementById("flashcardShowBtn"),
+    flashcardAgainBtn: document.getElementById("flashcardAgainBtn"),
+    flashcardKnownBtn: document.getElementById("flashcardKnownBtn"),
+    flashcardNextBtn: document.getElementById("flashcardNextBtn")
   };
 
   // Initial assignment note: progress is cached on the iPad/browser so revision can continue between sessions.
   let progress = loadProgress();
+  let flashcardProgress = loadFlashcardProgress();
   let orderedQuestions = [];
+  let orderedFlashcards = [];
   let currentIndex = 0;
+  let currentFlashcardIndex = 0;
   let selectedOption = null;
   let displayedOptions = [];
 
@@ -45,6 +62,19 @@
   function saveProgress() {
     localStorage.setItem(progressKey, JSON.stringify(progress));
     renderScore();
+  }
+
+  function loadFlashcardProgress() {
+    try {
+      return JSON.parse(localStorage.getItem(flashcardProgressKey)) || {};
+    } catch {
+      return {};
+    }
+  }
+
+  function saveFlashcardProgress() {
+    localStorage.setItem(flashcardProgressKey, JSON.stringify(flashcardProgress));
+    renderFlashcardScore();
   }
 
   function shuffle(items) {
@@ -75,6 +105,14 @@
     els.topicNav.innerHTML = data.topics
       .map((topic) => `<a href="#summary-${topic.id}">${topic.title}</a>`)
       .join("");
+  }
+
+  function buildFlashcardControls() {
+    const sections = [...new Set(flashcards.map((card) => card.section))].sort((a, b) => a.localeCompare(b));
+    els.flashcardSectionFilter.innerHTML = [
+      '<option value="all">All note sections</option>',
+      ...sections.map((section) => `<option value="${section}">${section}</option>`)
+    ].join("");
   }
 
   function renderSummaries() {
@@ -128,7 +166,7 @@
     els.feedback.className = "feedback";
 
     if (!orderedQuestions.length) {
-      els.questionNumber.textContent = "No questions";
+      els.questionNumber.textContent = "No MCQs";
       els.questionTopic.textContent = "Change filters";
       els.questionDifficulty.textContent = "";
       els.questionText.textContent = "No questions match the current filters.";
@@ -146,7 +184,7 @@
     progress[question.id] = entry;
     saveProgress();
 
-    els.questionNumber.textContent = `Question ${currentIndex + 1} of ${orderedQuestions.length}`;
+    els.questionNumber.textContent = `MCQ ${currentIndex + 1} of ${orderedQuestions.length}`;
     els.questionTopic.textContent = topic.title;
     els.questionDifficulty.textContent = question.difficulty;
     els.questionText.textContent = question.prompt;
@@ -224,6 +262,63 @@
     renderQuestion();
   }
 
+  function buildFlashcardSet() {
+    const section = els.flashcardSectionFilter.value;
+    orderedFlashcards = flashcards.filter((card) => section === "all" || card.section === section);
+    currentFlashcardIndex = 0;
+    renderFlashcard();
+  }
+
+  function flashcardId(card) {
+    return `${card.section}::${card.question}`;
+  }
+
+  function renderFlashcard() {
+    if (!orderedFlashcards.length) {
+      els.flashcardCardNumber.textContent = "No cards";
+      els.flashcardSectionName.textContent = "Change filter";
+      els.flashcardPrompt.textContent = "No flashcards match this section.";
+      els.flashcardAnswer.hidden = true;
+      els.flashcardAnswer.textContent = "";
+      return;
+    }
+
+    const card = orderedFlashcards[currentFlashcardIndex];
+    const id = flashcardId(card);
+    const entry = flashcardProgress[id] || {};
+    entry.seen = (entry.seen || 0) + 1;
+    flashcardProgress[id] = entry;
+    saveFlashcardProgress();
+
+    els.flashcardCardNumber.textContent = `Card ${currentFlashcardIndex + 1} of ${orderedFlashcards.length}`;
+    els.flashcardSectionName.textContent = card.section;
+    els.flashcardPrompt.textContent = card.question;
+    els.flashcardAnswer.textContent = card.answer;
+    els.flashcardAnswer.hidden = true;
+  }
+
+  function showFlashcardAnswer() {
+    if (!orderedFlashcards.length) return;
+    els.flashcardAnswer.hidden = false;
+  }
+
+  function markFlashcard(known) {
+    if (!orderedFlashcards.length) return;
+    const card = orderedFlashcards[currentFlashcardIndex];
+    flashcardProgress[flashcardId(card)] = {
+      ...(flashcardProgress[flashcardId(card)] || {}),
+      known
+    };
+    saveFlashcardProgress();
+    nextFlashcard();
+  }
+
+  function nextFlashcard() {
+    if (!orderedFlashcards.length) return;
+    currentFlashcardIndex = (currentFlashcardIndex + 1) % orderedFlashcards.length;
+    renderFlashcard();
+  }
+
   function toggleMarked() {
     if (!orderedQuestions.length) return;
     const question = orderedQuestions[currentIndex];
@@ -241,6 +336,15 @@
     els.answeredCount.textContent = answered.length;
     els.correctCount.textContent = correct.length;
     els.accuracyRate.textContent = answered.length ? `${Math.round((correct.length / answered.length) * 100)}%` : "0%";
+  }
+
+  function renderFlashcardScore() {
+    const entries = Object.values(flashcardProgress);
+    const seen = entries.filter((entry) => entry.seen > 0);
+    const known = entries.filter((entry) => entry.known);
+    els.flashcardTotalCount.textContent = flashcards.length;
+    els.flashcardSeenCount.textContent = seen.length;
+    els.flashcardKnownCount.textContent = known.length;
   }
 
   function resetProgress() {
@@ -261,10 +365,17 @@
     els.nextBtn.addEventListener("click", randomNext);
     els.checkBtn.addEventListener("click", checkAnswer);
     els.markBtn.addEventListener("click", toggleMarked);
+    els.flashcardSectionFilter.addEventListener("change", buildFlashcardSet);
+    els.flashcardShowBtn.addEventListener("click", showFlashcardAnswer);
+    els.flashcardAgainBtn.addEventListener("click", () => markFlashcard(false));
+    els.flashcardKnownBtn.addEventListener("click", () => markFlashcard(true));
+    els.flashcardNextBtn.addEventListener("click", nextFlashcard);
   }
 
   buildControls();
+  buildFlashcardControls();
   renderSummaries();
   bindEvents();
   buildQuestionSet();
+  buildFlashcardSet();
 })();

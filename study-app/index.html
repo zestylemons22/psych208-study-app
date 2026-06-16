@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PSYCH 208 Exam Practice</title>
+  <title>PSYCH 208 Exam Practice and Flashcards</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,7 +11,7 @@
   <header class="topbar">
     <div>
       <p class="eyebrow">PSYCH 208 / 306</p>
-      <h1>Exam Practice</h1>
+      <h1>Exam Practice and Flashcards</h1>
     </div>
     <div class="score-strip" aria-live="polite">
       <span><strong id="answeredCount">0</strong> answered</span>
@@ -23,7 +23,7 @@
   <main class="app-shell">
     <aside class="side-panel" aria-label="Question controls">
       <section class="control-band">
-        <h2>Practice Set</h2>
+        <h2>MCQ Practice Set</h2>
         <label for="topicFilter">Topic</label>
         <select id="topicFilter"></select>
 
@@ -53,6 +53,18 @@
           <button id="shuffleBtn" type="button">Shuffle</button>
           <button id="resetBtn" type="button" class="secondary">Reset Progress</button>
         </div>
+      </section>
+
+      <section class="control-band">
+        <h2>Google Doc Flashcards</h2>
+        <label for="flashcardSectionFilter">Source section</label>
+        <select id="flashcardSectionFilter"></select>
+        <div class="flashcard-stats" aria-live="polite">
+          <span><strong id="flashcardTotalCount">0</strong> cards</span>
+          <span><strong id="flashcardSeenCount">0</strong> seen</span>
+          <span><strong id="flashcardKnownCount">0</strong> known</span>
+        </div>
+        <a href="#flashcards" class="jump-link">Open Google Doc flashcards</a>
       </section>
 
       <section class="control-band">
@@ -86,6 +98,29 @@
     </section>
   </main>
 
+  <section id="flashcards" class="flashcard-section" aria-label="Google Doc flashcards">
+    <div class="section-heading">
+      <p class="eyebrow">Google Doc Notes</p>
+      <h2>Producing Psychological Knowledge Flashcards</h2>
+      <p class="section-note">Built from the extracted source notes; use the markdown/CSV files in <code>outputs</code> for checking or import.</p>
+    </div>
+
+    <article class="flashcard-surface">
+      <div class="question-meta">
+        <span id="flashcardCardNumber"></span>
+        <span id="flashcardSectionName"></span>
+      </div>
+      <h3 id="flashcardPrompt"></h3>
+      <p id="flashcardAnswer" class="flashcard-answer" hidden></p>
+      <div class="question-actions">
+        <button id="flashcardShowBtn" type="button">Show Answer</button>
+        <button id="flashcardAgainBtn" type="button" class="secondary">Study Again</button>
+        <button id="flashcardKnownBtn" type="button">Know It</button>
+        <button id="flashcardNextBtn" type="button" class="secondary">Next Card</button>
+      </div>
+    </article>
+  </section>
+
   <section id="summaries" class="summary-section">
     <div class="section-heading">
       <p class="eyebrow">Lecture-Based</p>
@@ -96,6 +131,7 @@
 
   <script src="questions.js"></script>
   <script src="extra-questions.js"></script>
+  <script src="flashcards.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

@@ -102,7 +102,8 @@ h1 {
 
 .control-band,
 .question-surface,
-.summary-card {
+.summary-card,
+.flashcard-surface {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--panel);
@@ -197,7 +198,8 @@ button.secondary:hover {
 
 .topic-nav a,
 .question-footer a,
-.link-button {
+.link-button,
+.jump-link {
   color: var(--accent-dark);
   font-weight: 800;
   text-decoration: none;
@@ -209,8 +211,14 @@ button.secondary:hover {
 }
 
 .topic-nav a:hover,
-.question-footer a:hover {
+.question-footer a:hover,
+.jump-link:hover {
   text-decoration: underline;
+}
+
+.jump-link {
+  display: inline-block;
+  margin-top: 12px;
 }
 
 .practice-panel {
@@ -332,8 +340,19 @@ button.secondary:hover {
   padding: 8px clamp(16px, 4vw, 40px) 40px;
 }
 
+.flashcard-section {
+  width: min(1280px, 100%);
+  margin: 0 auto;
+  padding: 8px clamp(16px, 4vw, 40px) 24px;
+}
+
 .section-heading {
   margin: 10px 0 18px;
+}
+
+.section-note {
+  max-width: 760px;
+  color: var(--muted);
 }
 
 .summary-grid {
@@ -364,6 +383,48 @@ button.secondary:hover {
   margin-top: 12px;
   color: var(--muted);
   font-size: 0.88rem;
+}
+
+.flashcard-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.flashcard-stats span {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 3px 9px;
+  background: #fff;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.flashcard-stats strong {
+  margin-right: 4px;
+  color: var(--ink);
+}
+
+.flashcard-surface {
+  max-width: 900px;
+  padding: clamp(18px, 3vw, 30px);
+}
+
+#flashcardPrompt {
+  margin-bottom: 16px;
+  font-size: clamp(1.1rem, 1.6vw, 1.45rem);
+}
+
+.flashcard-answer {
+  min-height: 120px;
+  border-left: 4px solid var(--accent);
+  padding: 14px 16px;
+  background: #f8fafc;
+  white-space: pre-line;
 }
 
 .empty-state {
